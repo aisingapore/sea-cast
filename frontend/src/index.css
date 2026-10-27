@@ -1,0 +1,62 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg: #f8f9fa;
+  --surface: #ffffff;
+  --border: #ddd;
+  --border-subtle: #f0f0f0;
+  --text: #1a1a1a;
+  --text-muted: #6b7280;
+  --text-subtle: #9ca3af;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --danger: #dc2626;
+  --danger-hover: #b91c1c;
+  --badge-bg: #e5e7eb;
+  --badge-fg: #374151;
+  --badge-ready-bg: #dcfce7;
+  --badge-ready-fg: #15803d;
+  --badge-error-bg: #fee2e2;
+  --badge-error-fg: #b91c1c;
+  --badge-pending-bg: #fef9c3;
+  --badge-pending-fg: #854d0e;
+}
+
+[data-theme="dark"] {
+  --bg: #0f1115;
+  --surface: #1a1d23;
+  --border: #2a2e37;
+  --border-subtle: #23272f;
+  --text: #e8eaed;
+  --text-muted: #9aa0ab;
+  --text-subtle: #6b7280;
+  --accent: #3b82f6;
+  --accent-hover: #60a5fa;
+  --danger: #ef4444;
+  --danger-hover: #f87171;
+  --badge-bg: #2a2e37;
+  --badge-fg: #9aa0ab;
+  --badge-ready-bg: #14532d;
+  --badge-ready-fg: #4ade80;
+  --badge-error-bg: #450a0a;
+  --badge-error-fg: #f87171;
+  --badge-pending-bg: #422006;
+  --badge-pending-fg: #fbbf24;
+}
+
+body {
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  background: var(--bg);
+  color: var(--text);
+}

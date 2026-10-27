@@ -1,0 +1,66 @@
+# languages.yaml — single source of truth for language support.
+#
+# BCP-47 base code (lowercase) used across the board (also used by Pipecat).
+# Human-readable names are derived via:
+# Intl.DisplayNames (frontend) & langcodes (backend)
+#
+# Overrides are defined where Unicode CLDR display names are not ideal.
+#
+# To add a language supported by the app, add it to app.source / app.target.
+
+app:
+  source: ["en", "zh", "ms", "ta", "id", "th", "vi", "km", "fil", "lo", "my", "yue", "nan"]
+  target: ["en", "zh", "ms", "ta", "id", "th", "vi", "km", "fil", "lo", "my"]
+
+#   ["*"]  -> "every language supported by app (source/target)"
+#   code_overrides: {BCP-47 code: model-specific code}
+#
+# Presets describe what a model family recognises or translates into. A profile in
+# sea-cast.yaml names one (languages: whisper-large-v3) or lists its own inline.
+
+stt_models:
+  # Whisper large-v3 / large-v3-turbo
+  whisper-large-v3:
+    recognizes:
+      ["en", "zh", "de", "es", "ru", "ko", "fr", "ja", "pt", "tr",
+       "pl", "ca", "nl", "ar", "sv", "it", "id", "hi", "fi", "vi",
+       "he", "uk", "el", "ms", "cs", "ro", "da", "hu", "ta", "no",
+       "th", "ur", "hr", "bg", "lt", "la", "mi", "ml", "cy", "sk",
+       "te", "fa", "lv", "bn", "sr", "az", "sl", "kn", "et", "mk",
+       "br", "eu", "is", "hy", "ne", "mn", "bs", "kk", "sq", "sw",
+       "gl", "mr", "pa", "si", "km", "sn", "yo", "so", "af", "oc",
+       "ka", "be", "tg", "sd", "gu", "am", "yi", "lo", "uz", "fo",
+       "ht", "ps", "tk", "nn", "mt", "sa", "lb", "my", "bo", "fil",
+       "mg", "as", "tt", "haw", "ln", "ha", "ba", "jv", "su", "yue"]
+    supports_auto: false
+    code_overrides: { fil: "tl" } # Whisper token is 'tl' (Tagalog)
+
+  # ElevenLabs Scribe v2 (scribe_v2_realtime): ~94 languages
+  scribe-v2:
+    recognizes:
+      ["be", "bs", "bg", "ca", "hr", "cs", "da", "nl", "en", "et",
+       "fi", "fr", "gl", "de", "el", "hu", "is", "id", "it", "ja",
+       "kn", "lv", "mk", "ms", "ml", "no", "pl", "pt", "ro", "ru",
+       "sk", "es", "sv", "tr", "uk", "vi", "hy", "az", "bn", "yue",
+       "fil", "ka", "gu", "hi", "kk", "lt", "mt", "zh", "mr", "ne",
+       "or", "fa", "sr", "sl", "sw", "ta", "te", "af", "ar", "as",
+       "ast", "my", "ha", "he", "jv", "ko", "ky", "lb", "mi", "oc",
+       "pa", "tg", "th", "uz", "cy", "am", "lg", "ig", "ga", "km",
+       "ku", "lo", "mn", "nso", "ps", "sn", "sd", "si", "so", "ur",
+       "wo", "xh", "yo", "zu"]
+    supports_auto: true
+
+  # MERaLiON3: auto-detect only (ignores any code it is sent). This list is what it
+  # detects and is shown in the dashboard's tooltip.
+  meralion3:
+    recognizes: ["en", "zh", "ms", "ta", "yue", "nan", "id", "vi", "th"]
+    supports_auto: true
+    auto_only: true
+
+# Only for translator model families that don't cover every app target language.
+# A translator profile with no languages is assumed to cover all of them.
+translator_models: {}
+
+display_overrides:
+  nan: "Hokkien" # CLDR: "Min Nan Chinese"
+  zh: "Mandarin Chinese" # CLDR: "Chinese"

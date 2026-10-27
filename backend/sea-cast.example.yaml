@@ -1,0 +1,85 @@
+# YAML config for running SEA-CAST
+#
+# Copy to sea-cast.yaml next to .env.
+# Secrets never go in this file: a profile names the env var that holds its key
+# (api_key_env), and the key itself goes in .env.
+# Profile ids and labels are visible to anyone who can open the dashboard, so
+# keep anything private out of them.
+
+# Speech-to-text endpoints. (The first is the default)
+#   adapter:   openai     any OpenAI-compatible /audio/transcriptions endpoint (batch)
+#              elevenlabs ElevenLabs realtime (streaming)
+#   auth:      omit if none; { type: bearer, api_key_env: ... } or
+#              { type: basic, username_env: ..., password_env: ... }.
+#              A named env var that isn't set will raise errors on startup.
+#   languages: State a preset from languages.yaml's stt_models, or state inline:
+#              { recognizes: [en, km], supports_auto: false }
+stt_profiles:
+  # Local whisper.cpp server (no key needed).
+  - id: whisper-local
+    label: Whisper (local)
+    adapter: openai
+    base_url: http://localhost:8000/v1
+    model: large-v3-turbo-q5_0
+    languages: whisper-large-v3
+
+  # Whisper on OpenRouter. Define OPENROUTER_API_KEY in .env.
+  # - id: whisper-openrouter
+  #   label: Whisper (OpenRouter)
+  #   adapter: openai
+  #   base_url: https://openrouter.ai/api/v1
+  #   model: openai/whisper-large-v3-turbo
+  #   auth: { type: bearer, api_key_env: OPENROUTER_API_KEY }
+  #   languages: whisper-large-v3
+
+  # A model behind an HTTP Basic-auth gateway, with its languages listed inline.
+  # Define STT_USERNAME and STT_PASSWORD in .env.
+  # - id: whisper-auth-api
+  #   label: Whisper (API)
+  #   adapter: openai
+  #   base_url: https://stt.example.org/v1
+  #   model: custom-whisper
+  #   auth: { type: basic, username_env: STT_USERNAME, password_env: STT_PASSWORD }
+  #   languages: { recognizes: [en, ta], supports_auto: false }
+  #   options: { timeout_secs: 15 }
+
+  # ElevenLabs realtime STT service. Define ELEVENLABS_API_KEY in .env.
+  # - id: elevenlabs
+  #   label: ElevenLabs
+  #   adapter: elevenlabs
+  #   model: scribe_v2_realtime
+  #   auth: { type: bearer, api_key_env: ELEVENLABS_API_KEY }
+  #   languages: scribe-v2
+  #   options: { vad_silence_secs: 0.6, vad_threshold: 0.4 }
+
+# Translation endpoints, any OpenAI-compatible chat API. (The first is the default)
+translator_profiles:
+  # Local Ollama server
+  - id: sealion-e2b
+    label: Gemma-SEA-LION v4.5 E2B (Ollama)
+    base_url: http://localhost:11434/v1
+    model: aisingapore/Gemma-SEA-LION-v4.5-E2B-IT
+    extra_body:
+      reasoning_effort: none
+
+  # SEA-LION API. Define SEALION_KEY (your SEA-LION API key) in .env.
+  # - id: sealion
+  #   label: Qwen-SEA-LION-v4.5-27B-IT (API)
+  #   base_url: https://api.sea-lion.ai/v1
+  #   model: aisingapore/Qwen-SEA-LION-v4.5-27B-IT
+  #   api_key_env: SEALION_KEY
+  #   extra_body:
+  #     chat_template_kwargs:
+  #       enable_thinking: false
+
+# The translation system prompt. It must contain {language}, which is replaced
+# with the target language's name. Relative paths resolve against the working
+# directory (backend/).
+system_prompt_path: app/prompts/system_prompt.md
+
+# Glossary (optional): a SEA-GULL glossary JSONL file
+# (https://github.com/aisingapore/seagull). Each translation prompt then gets the
+# exact renderings of the terms the speaker used. Omit the block to turn the
+# glossary off.
+# glossary:
+#   path: data/glossary.jsonl

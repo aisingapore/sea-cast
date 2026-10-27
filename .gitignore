@@ -1,0 +1,35 @@
+__pycache__/
+*.py[codz]
+*$py.class
+
+# Environments
+.env
+.envrc
+sea-cast.yaml
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Node / frontend (Vite + React)
+node_modules/
+frontend/dist/
+dist-ssr/
+*.local
+.vite/
+# npm/yarn/pnpm debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.eslintcache
+# Vite local env files
+.env.local
+.env.*.local
+
+backend/recordings/*
+
+# Glossary files
+backend/data/

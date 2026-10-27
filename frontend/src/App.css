@@ -1,0 +1,836 @@
+/* Lock the dashboard to one screen: a full-height flex column where only the
+   captions flex + scroll internally, so the speaker never scrolls the page. */
+.app {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+/* Fills the height left under the header; its children (controls, tabs,
+   tab-panel) stack and the tab-panel absorbs the remaining space. */
+.session {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* The active tab's body owns the leftover height. overflow-y is the scroll
+   backstop for the Metrics and Settings tabs; on the Session tab the
+   captions flex-fill instead so this never scrolls. */
+.tab-panel {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.app-header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.app-subtitle {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* Admin sign-in card for the gated /history page. */
+.admin-login {
+  max-width: 22rem;
+  margin: 3rem auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  padding: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.admin-login h2 {
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+.admin-login-hint {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-top: -0.4rem;
+}
+
+.admin-login label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.admin-login input {
+  padding: 0.5rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 0.95rem;
+}
+
+.admin-login-error {
+  color: var(--danger, #d33);
+  font-size: 0.85rem;
+}
+
+/* Discreet link to the gated /history page (admin session archive). */
+.header-link {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  text-decoration: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.3rem 0.6rem;
+  transition:
+    background 0.15s,
+    color 0.15s;
+}
+
+.header-link:hover {
+  background: var(--border);
+  color: var(--text);
+}
+
+/* Controls */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+/* Collapsed-controls bar (shown during a live session): the settings are
+   read-only once live, so we hide them and keep only the live action row. */
+.controls-toggle {
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-muted);
+  border-radius: 6px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.controls-toggle:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+.controls-summary {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Header row of a control-group, so a label can sit inline with an info badge. */
+.control-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+/* Small "ⓘ" affordance carrying a hover/focus tooltip (e.g. the languages an
+   auto-detecting transcriber supports). Focusable so keyboard users can reveal it too. */
+.info-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: help;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.info-badge:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+.info-tooltip {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 20;
+  width: max-content;
+  max-width: 240px;
+  padding: 0.5rem 0.6rem;
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  font-size: 0.72rem;
+  font-weight: 400;
+  line-height: 1.35;
+  white-space: normal;
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.12s ease;
+  pointer-events: none;
+}
+
+.info-badge:hover .info-tooltip,
+.info-badge:focus-visible .info-tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+.control-group select {
+  font-size: 0.9rem;
+  padding: 0.35rem 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  /* Every control's input row is 2rem tall, so the labels above them line up
+     (the bar centres each control column vertically). */
+  height: 2rem;
+}
+
+.control-check .check-row {
+  display: flex;
+  align-items: center;
+  height: 2rem;
+}
+
+/* Fixed width for the Transcriber and Translator dropdowns, so a long profile
+   label doesn't widen them and crowd the other controls; the full label shows
+   on hover. */
+.control-group select.profile-select {
+  width: 12rem;
+  text-overflow: ellipsis;
+}
+
+.control-group select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.control-group input[type="range"] {
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.control-group input[type="range"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* VAD tuning panel: sliders stacked with room to read the live value labels. */
+.vad-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 24rem;
+  padding: 1rem;
+}
+
+/* Source channel and Glossary checkboxes: align the box with the sibling selects. */
+.control-check input[type="checkbox"] {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin-top: 0.4rem;
+  cursor: pointer;
+  accent-color: var(--accent);
+}
+
+.control-check input[type="checkbox"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn {
+  padding: 0.45rem 1.25rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-start {
+  background: var(--accent);
+  color: #fff;
+}
+
+.btn-start:not(:disabled):hover {
+  background: var(--accent-hover);
+}
+
+.btn-stop {
+  background: var(--danger);
+  color: #fff;
+}
+
+.btn-stop:not(:disabled):hover {
+  background: var(--danger-hover);
+}
+
+.transport-badge {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: var(--badge-bg);
+  color: var(--badge-fg);
+  text-transform: lowercase;
+}
+
+.transport-badge[data-state="ready"] {
+  background: var(--badge-ready-bg);
+  color: var(--badge-ready-fg);
+}
+
+.transport-badge[data-state="error"] {
+  background: var(--badge-error-bg);
+  color: var(--badge-error-fg);
+}
+
+.transport-badge[data-state="connecting"],
+.transport-badge[data-state="authenticating"],
+.transport-badge[data-state="initializing"] {
+  background: var(--badge-pending-bg);
+  color: var(--badge-pending-fg);
+}
+
+/* STT error banner (e.g. an HTTP 429 from the STT service) */
+.stt-error-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--danger);
+  background: var(--badge-error-bg);
+  color: var(--badge-error-fg);
+  font-size: 0.875rem;
+}
+
+.stt-error-dismiss {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0 0.25rem;
+}
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid var(--border);
+  margin-bottom: 1rem;
+}
+
+.tab {
+  padding: 0.5rem 1.25rem;
+  border: none;
+  background: transparent;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: color 0.15s;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+/* Caption columns fill the tab-panel height (single grid row) and scroll
+   inside — the page itself stays fixed. */
+.captions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: minmax(0, 1fr);
+  gap: 1rem;
+  flex: 1;
+  min-height: 0;
+}
+
+.caption-col {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  /* No top padding: the sticky <h2> supplies it, so scrolling text can't peek
+     above the pinned label. */
+  padding: 0 1rem 1rem;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Pin the language label at the top while the text scrolls underneath. The
+   horizontal negative margin + matching padding lets its surface background
+   span the full column width and mask text passing behind it. */
+.caption-col h2 {
+  position: sticky;
+  top: 0;
+  background: var(--surface);
+  margin: 0 -1rem 0.75rem;
+  padding: 1rem 1rem 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+/* Translation column with a language switcher: pin the label + chips together
+   so the chips stay reachable while captions scroll underneath. The h2 keeps its
+   font styling but drops its own sticky/border in favour of the wrapper's. */
+.caption-col-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface);
+  margin: 0 -1rem 0.75rem;
+  padding: 1rem 1rem 0.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.caption-col-head h2 {
+  position: static;
+  margin: 0;
+  padding: 0;
+  border-bottom: none;
+}
+
+.caption-col-head .lang-chips {
+  max-width: none;
+  margin-top: 0.6rem;
+}
+
+.line {
+  margin-bottom: 0.5rem;
+  line-height: 1.6;
+}
+
+.line.partial {
+  color: var(--text-subtle);
+  font-style: italic;
+}
+
+.line.final {
+  color: var(--text);
+}
+
+.empty {
+  color: var(--text-subtle);
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+/* Metrics */
+.metrics {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.metrics-empty {
+  margin-top: 0.5rem;
+}
+
+.metrics-card {
+  max-width: 560px;
+}
+
+.metrics-card h3 {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
+}
+
+.metrics-chart {
+  height: 160px;
+  margin-bottom: 0.5rem;
+}
+
+.metrics-table {
+  width: 100%;
+  max-width: 560px;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.metrics-table th,
+.metrics-table td {
+  text-align: left;
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.metrics-table th {
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.metric-value {
+  font-variant-numeric: tabular-nums;
+  font-family: monospace;
+}
+
+/* History */
+.history-bar {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+/* Destructive-action guard (session delete). Dimmed full-screen backdrop with a
+   centred card; buttons reuse .btn / .btn-start / .btn-stop. */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.confirm-box {
+  max-width: 24rem;
+  padding: 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.confirm-box h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+}
+
+.confirm-box p {
+  margin: 0 0 1.25rem;
+  color: var(--text-muted);
+}
+
+.confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.history-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 0.875rem;
+  transition: border-color 0.15s;
+}
+
+.history-row:hover {
+  border-color: var(--accent);
+}
+
+/* The clickable info area inside a row (and the header cells): 5 columns. */
+.history-open {
+  display: grid;
+  grid-template-columns: 1.6fr 1fr 1.4fr 0.9fr 0.7fr;
+  gap: 0.75rem;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  padding: 0;
+  cursor: pointer;
+}
+
+.history-head {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.history-head:hover {
+  border-color: transparent;
+}
+
+.history-head .history-open {
+  cursor: default;
+}
+
+.history-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+}
+
+.history-meta dt {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.history-meta dd {
+  color: var(--text);
+  margin-top: 0.15rem;
+}
+
+.history-audio {
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+/* Theme toggle */
+.theme-toggle {
+  margin-left: auto;
+  padding: 0.35rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
+}
+
+.theme-toggle:hover {
+  background: var(--border);
+}
+
+/* Mic waveform */
+.mic-waveform {
+  display: flex;
+  align-items: center;
+}
+
+.mic-waveform canvas {
+  display: block;
+  border-radius: 4px;
+}
+
+/* ── Target-language chips (extra audience languages) ─────────────────── */
+
+.lang-chips-group {
+  min-width: 0;
+}
+
+.lang-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  max-width: 20rem;
+}
+
+.lang-chip {
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-muted);
+  border-radius: 999px;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+}
+
+.lang-chip.selected {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.lang-chip:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Session-history translation toggle: pick which translations to expand. */
+.history-tr-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0.25rem 0 0.75rem;
+}
+
+.history-tr-toggle > span {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.history-tr-toggle .lang-chips {
+  max-width: none;
+}
+
+/* ── Room panel (QR + join URL + listener counts) ─────────────────────── */
+
+.room-panel {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  flex-wrap: wrap;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 8px;
+  padding: 0.9rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+/* White backing so the QR stays scannable in dark mode. */
+.room-qr {
+  background: #fff;
+  padding: 6px;
+  border-radius: 8px;
+  line-height: 0;
+}
+
+.room-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.room-code {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+}
+
+.room-code strong {
+  color: var(--text);
+  letter-spacing: 0.12em;
+  font-size: 1.1rem;
+}
+
+.room-join-url {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.room-join-url code {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.room-copy {
+  border: 1px solid var(--border);
+  background: none;
+  color: var(--text-muted);
+  border-radius: 6px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.room-copy:hover {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+.room-listeners {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.listener-chip {
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: center;
+  background: var(--badge-bg);
+  color: var(--badge-fg);
+  border-radius: 999px;
+  padding: 0.15rem 0.6rem;
+  font-size: 0.8rem;
+}
+
+.listener-chip strong {
+  color: var(--text);
+}
+
+.room-monitor-link {
+  font-size: 0.85rem;
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.room-monitor-link:hover {
+  text-decoration: underline;
+}
